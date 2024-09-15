@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/NewsPidgey-News-App/static/css/main.1c920328.css",
+    "main.js": "/NewsPidgey-News-App/static/js/main.5969d318.js",
+    "static/js/453.08c78f33.chunk.js": "/NewsPidgey-News-App/static/js/453.08c78f33.chunk.js",
+    "index.html": "/NewsPidgey-News-App/index.html",
+    "main.1c920328.css.map": "/NewsPidgey-News-App/static/css/main.1c920328.css.map",
+    "main.5969d318.js.map": "/NewsPidgey-News-App/static/js/main.5969d318.js.map",
+    "453.08c78f33.chunk.js.map": "/NewsPidgey-News-App/static/js/453.08c78f33.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1c920328.css",
+    "static/js/main.5969d318.js"
+  ]
+}
