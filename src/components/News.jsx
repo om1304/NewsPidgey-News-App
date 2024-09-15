@@ -13,6 +13,8 @@ export class News extends Component {
   static propTypes = {
     pageSize: PropTypes.number,
     category: PropTypes.string,
+    apiKey: PropTypes.string.isRequired,
+    setProgress: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -22,7 +24,7 @@ export class News extends Component {
       loading: true,
       page: 1,
       totalResults: 0,
-      hasMore: true, // Indicates if more articles are available
+      hasMore: true,
     };
     document.title = `NewsPidgey - ${
       this.props.category === "general"
@@ -36,48 +38,57 @@ export class News extends Component {
     this.fetchNews();
   }
 
-  // Fetch news function
   async fetchNews() {
-    const { category, pageSize, setProgress, apiKey} = this.props;
-    const { page } = this.state;
-    setProgress(10)
-    let url = `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}&page=${page}&pageSize=${pageSize}`;
+    const { category, pageSize, setProgress, apiKey } = this.props;
+    const { page, articles } = this.state;
+
+    setProgress(10);
+
+    const url = `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}&page=${page}&pageSize=${pageSize}`;
 
     this.setState({ loading: true });
-    try {
-      let data = await fetch(url);
-      setProgress(40)
-      let parsedData = await data.json();
-      setProgress(70)
-      const newTotalResults = parsedData.totalResults;
 
-      this.setState({
-        articles: [...this.state.articles, ...parsedData.articles],
-        totalResults: newTotalResults,
+    try {
+      const response = await fetch(url);
+      setProgress(40);
+
+      const data = await response.json();
+      setProgress(70);
+
+      const newArticles = data.articles;
+
+      // Create a Set of existing article URLs
+      const existingUrls = new Set(articles.map(article => article.url));
+
+      // Filter out duplicates
+      const uniqueArticles = [
+        ...articles,
+        ...newArticles.filter(article => !existingUrls.has(article.url))
+      ];
+
+      this.setState(prevState => ({
+        articles: uniqueArticles,
+        totalResults: data.totalResults,
         loading: false,
-        hasMore:
-          this.state.articles.length + parsedData.articles.length <
-          newTotalResults,
-      });
-      setProgress(100)
+        hasMore: uniqueArticles.length < data.totalResults,
+      }));
+
+      setProgress(100);
     } catch (error) {
       console.error("Error fetching news:", error);
       this.setState({ loading: false });
     }
   }
 
-  // Fetch more data for infinite scroll
-  fetchMoreData = async () => {
-    if (this.state.articles.length < this.state.totalResults) {
-      this.setState(
-        (prevState) => ({
-          page: prevState.page + 1,
-        }),
-        this.fetchNews
-      );
-    } else {
-      this.setState({ hasMore: false });
-    }
+  fetchMoreData = () => {
+    this.setState(
+      (prevState) => ({
+        page: prevState.page + 1,
+      }),
+      () => {
+        this.fetchNews(); // Fetch news after page is updated
+      }
+    );
   };
 
   render() {
@@ -95,7 +106,6 @@ export class News extends Component {
           }`}
         </h2>
 
-        {/* Infinite Scroll Component */}
         <InfiniteScroll
           dataLength={this.state.articles.length} // Length of articles already loaded
           next={this.fetchMoreData} // Fetch more data function
@@ -109,21 +119,15 @@ export class News extends Component {
         >
           <div className="container">
             <div className="row mt-4">
-              {this.state.articles.map((element, index) => {
+              {this.state.articles.map((element) => {
                 if (element.title === "[Removed]") {
                   return null;
                 }
                 return (
                   <div className="col-md-4" key={element.url}>
                     <NewsItem
-                      title={
-                        element.title ? element.title.slice(0, 45) + "..." : ""
-                      }
-                      content={
-                        element.description
-                          ? element.description.slice(0, 100) + "..."
-                          : ""
-                      }
+                      title={element.title ? element.title.slice(0, 45) + "..." : ""}
+                      content={element.description ? element.description.slice(0, 100) + "..." : ""}
                       imageUrl={element.urlToImage ? element.urlToImage : ""}
                       newsUrl={element.url ? element.url : ""}
                       author={element.author ? element.author : ""}
