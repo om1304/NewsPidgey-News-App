@@ -1,0 +1,12 @@
+/* TopScrollSpinner.css */
+.top-scroll-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0; /* Position it at the top, just below the header */
+}
+
+.spinner-grow {
+  width: 2rem;
+  height: 2rem;
+}

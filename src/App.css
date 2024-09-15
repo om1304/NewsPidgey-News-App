@@ -1,0 +1,20 @@
+/* App.css */
+.loading-bar-custom {
+  height: 6px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.7), rgba(0,0,0,1), rgba(0,0,0,0.7)); 
+  box-shadow: 0 0 10px black;
+  animation: shinyBar 1.5s ease-in-out infinite;
+}
+
+/* Create a shiny animation */
+@keyframes shinyBar {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
